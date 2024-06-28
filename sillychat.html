@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SillyChat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .header {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: right;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .dropdown {
+            display: inline-block;
+            position: relative;
+            color: #fff;
+            cursor: pointer;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            right: 0;
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: #fff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .dropdown-content a:hover {
+            background-color: #555;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dark-mode {
+            background-color: #222;
+            color: #fff;
+        }
+        .light-mode {
+            background-color: #fff;
+            color: #000;
+        }
+        #chat-box {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        #chat-box.dark-mode {
+            background-color: #333;
+        }
+        #message-input {
+            width: calc(100% - 80px);
+            padding: 10px;
+            margin-top: 10px;
+            margin-right: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            background-color: #fff;
+        }
+        #message-input.dark-mode {
+            color: #fff;
+            background-color: #333;
+        }
+        #send-button {
+            padding: 10px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        #send-button:hover {
+            background-color: #555;
+        }
+        #send-button.dark-mode {
+            background-color: #555;
+        }
+        #welcome, #access-site, #main-chat, #profile, #settings {
+            display: none;
+        }
+        #welcome {
+            display: block;
+            text-align: center;
+        }
+        #welcome h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        #welcome p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #welcome input[type="text"],
+        #welcome input[type="password"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        #welcome button {
+            padding: 12px 24px;
+            margin-top: 10px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #welcome button:hover {
+            background-color: #555;
+        }
+        #access-site {
+            display: none;
+            text-align: center;
+        }
+        #access-site h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #access-site button {
+            padding: 12px 24px;
+            margin-top: 10px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #access-site button:hover {
+            background-color: #555;
+        }
+        #main-chat {
+            display: none;
+        }
+        #main-chat .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #main-chat .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+        #main-chat h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #main-chat .chat-container {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        #main-chat #message-input {
+            width: calc(100% - 80px);
+            padding: 10px;
+            margin-top: 10px;
+            margin-right: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            background-color: #fff;
+        }
+        #main-chat #message-input.dark-mode {
+            color: #fff;
+            background-color: #333;
+        }
+        #main-chat #send-button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        #main-chat #send-button:hover {
+            background-color: #555;
+        }
+        #main-chat #send-button.dark-mode {
+            background-color: #555;
+        }
+        #profile, #settings {
+            display: none;
+            text-align: center;
+        }
+        #profile-banner {
+            width: 100%;
+            height: 200px;
+            background-color: #ccc;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        #profile-banner select {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px;
+        }
+        #profile img {
+            max-width: 100px;
+            margin-right: 10px;
+            border-radius: 50%;
+            vertical-align: middle;
+            border: 5px solid white; /* Keep a consistent border */
+        }
+        #profile textarea {
+            width: 80%;
+            min-height: 100px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            color: #333;
+            background-color: #fff;
+            resize: none;
+        }
+        #profile textarea:read-only {
+            background-color: #f2f2f2;
+        }
+        #profile textarea.dark-mode {
+            color: #fff;
+            background-color: #333;
+        }
+        #profile button, #settings button {
+            padding: 12px 24px;
+            margin-top: 10px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #profile button:hover, #settings button:hover {
+            background-color: #555;
+        }
+        #settings label {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        #settings select {
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            color: #333;
+            background-color: #fff;
+        }
+        #settings select.dark-mode {
+            color: #fff;
+            background-color: #333;
+        }
+        .dark-mode {
+            color: #fff;
+            background-color: #333;
+        }
+        .back-to-menu {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+        }
+        .back-to-menu:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .active {
+            display: block !important;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .message.user {
+            justify-content: flex-end;
+            background-color: #d4edda;
+        }
+        .message p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome">
+        <h1>Welcome to SillyChat!</h1>
+        <p>Please enter your username and password to login:</p>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="access-site">
+        <h2>Access SillyChat</h2>
+        <button onclick="showSection('main-chat')">Go to Chat</button>
+        <button onclick="showSection('profile')">Go to Profile</button>
+        <button onclick="showSection('settings')">Go to Settings</button>
+    </div>
+
+    <div id="main-chat">
+        <div class="header">
+            <h2>SillyChat</h2>
+            <div class="dropdown">
+                Menu
+                <div class="dropdown-content">
+                    <a href="#" onclick="showSection('profile')">Profile</a>
+                    <a href="#" onclick="showSection('settings')">Settings</a>
+                    <a href="#" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div id="chat-box"></div>
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button id="send-button" onclick="sendMessage()">Send</button>
+    </div>
+
+    <div id="profile">
+        <div id="profile-banner">
+            <select id="profile-banner-color" onchange="changeBannerColor()">
+                <option value="#ccc">Grey</option>
+                <option value="#ff0000">Red</option>
+                <option value="#00ff00">Green</option>
+                <option value="#0000ff">Blue</option>
+            </select>
+        </div>
+        <div>
+            <img id="profile-pic" src="https://via.placeholder.com/100" alt="Profile Picture">
+            <input type="file" id="profile-pic-input" accept="image/*" onchange="uploadProfilePic()">
+        </div>
+        <textarea id="profile-bio" readonly>Enter your bio here...</textarea>
+        <button onclick="editBio()">Edit Bio</button>
+        <a href="#" class="back-to-menu" onclick="showSection('access-site')">Back to Menu</a>
+    </div>
+
+    <div id="settings">
+        <h2>Settings</h2>
+        <label for="theme">Choose Theme:</label>
+        <select id="theme" onchange="changeTheme()">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+        <a href="#" class="back-to-menu" onclick="showSection('access-site')">Back to Menu</a>
+    </div>
+
+    <script>
+        let theme = 'light';
+        let isEditingBio = false;
+
+        function login() {
+            // Placeholder login function
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username && password) {
+                document.getElementById('welcome').style.display = 'none';
+                document.getElementById('access-site').style.display = 'block';
+            } else {
+                alert('Please enter both username and password.');
+            }
+        }
+
+        function logout() {
+            document.getElementById('access-site').style.display = 'none';
+            document.getElementById('main-chat').style.display = 'none';
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('settings').style.display = 'none';
+            document.getElementById('welcome').style.display = 'block';
+        }
+
+        function showSection(sectionId) {
+            const sections = ['access-site', 'main-chat', 'profile', 'settings'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const messageText = messageInput.value.trim();
+            if (messageText) {
+                addMessage('user', messageText);
+                messageInput.value = '';
+            }
+        }
+
+        function addMessage(sender, text) {
+            const chatBox = document.getElementById('chat-box');
+            const message = document.createElement('div');
+            message.className = `message ${sender}`;
+            message.innerHTML = `<p>${text}</p>`;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function changeTheme() {
+            theme = document.getElementById('theme').value;
+            document.body.className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+            document.getElementById('message-input').className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+            document.getElementById('send-button').className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+            document.getElementById('chat-box').className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+            document.getElementById('profile-bio').className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+            document.getElementById('theme').className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+        }
+
+        function editBio() {
+            const bioTextarea = document.getElementById('profile-bio');
+            if (isEditingBio) {
+                bioTextarea.setAttribute('readonly', 'true');
+                isEditingBio = false;
+            } else {
+                bioTextarea.removeAttribute('readonly');
+                isEditingBio = true;
+            }
+        }
+
+        function changeBannerColor() {
+            const bannerColor = document.getElementById('profile-banner-color').value;
+            document.getElementById('profile-banner').style.backgroundColor = bannerColor;
+        }
+
+        function uploadProfilePic() {
+            const fileInput = document.getElementById('profile-pic-input');
+            const profilePic = document.getElementById('profile-pic');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePic.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
